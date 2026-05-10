@@ -1,5 +1,7 @@
-package com.siddhi.aispendaudit;
+package com.siddhi.aispendaudit.service;
 
+import com.siddhi.aispendaudit.model.AuditRequest;
+import com.siddhi.aispendaudit.model.AuditResponse;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.siddhi.aispendaudit;
+package com.siddhi.aispendaudit.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
