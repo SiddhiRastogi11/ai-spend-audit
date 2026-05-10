@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Spend Audit | Save Thousands on your AI Stack</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans">
+
+<header class="p-6 max-w-5xl mx-auto flex justify-between items-center">
+    <h1 class="text-2xl font-bold text-indigo-600">Audit.ai</h1>
+    <div class="text-sm font-medium text-slate-500">Built for Credex</div>
+</header>
+
+<main class="max-w-4xl mx-auto p-6">
+    <section class="text-center py-12">
+        <h2 class="text-4xl font-extrabold tracking-tight mb-4">Stop overpaying for AI credits.</h2>
+        <p class="text-lg text-slate-600">Run a 60-second audit to find hidden savings in your tool stack.</p>
+    </section>
+
+    <div id="audit-container" class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+        <h3 class="text-xl font-bold mb-6">Enter your stack details:</h3>
+
+        <div id="tool-rows">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4 tool-entry">
+                <input type="text" placeholder="Tool (e.g. Cursor)" class="p-3 border rounded-lg tool-name">
+                <input type="text" placeholder="Plan (e.g. Pro)" class="p-3 border rounded-lg tool-plan">
+                <input type="number" placeholder="Seats" class="p-3 border rounded-lg tool-seats">
+                <input type="number" placeholder="Monthly Spend ($)" class="p-3 border rounded-lg tool-spend">
+            </div>
+        </div>
+
+        <button onclick="runAudit()" id="submit-btn" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-lg hover:bg-indigo-700 transition">
+            Analyze My Spend
+        </button>
+    </div>
+
+    <div id="results" class="hidden mt-8 space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-100 text-center">
+                <p class="text-indigo-600 font-bold uppercase text-xs">Total Monthly Savings</p>
+                <p id="monthly-savings" class="text-4xl font-black text-indigo-900">$0</p>
+            </div>
+            <div class="bg-emerald-50 p-6 rounded-xl border border-emerald-100 text-center">
+                <p class="text-emerald-600 font-bold uppercase text-xs">Total Annual Savings</p>
+                <p id="annual-savings" class="text-4xl font-black text-emerald-900">$0</p>
+            </div>
+        </div>
+
+        <div class="bg-white p-8 rounded-xl border border-slate-200 shadow-sm">
+            <h4 class="font-bold text-lg mb-2">AI Optimization Summary:</h4>
+            <p id="ai-summary" class="text-slate-700 leading-relaxed italic"></p>
+        </div>
+    </div>
+</main>
+
+<script>
+    async function runAudit() {
+        const btn = document.getElementById('submit-btn');
+        const resultsDiv = document.getElementById('results');
+
+        // Show Loading State
+        btn.innerText = "Analyzing your stack...";
+        btn.disabled = true;
+
+        // Collect Data
+        const requests = [];
+        document.querySelectorAll('.tool-entry').forEach(row => {
+            requests.push({
+                toolName: row.querySelector('.tool-name').value,
+                plan: row.querySelector('.tool-plan').value,
+                seats: parseInt(row.querySelector('.tool-seats').value),
+                currentSpend: parseFloat(row.querySelector('.tool-spend').value)
+            });
+        });
+
+        try {
+            // POST to your Java API
+            const response = await fetch('/api/audit/run', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requests)
+            });
+
+            const data = await response.json();
+
+            // Display Results
+            document.getElementById('monthly-savings').innerText = `$${data.totalMonthlySavings}`;
+            document.getElementById('annual-savings').innerText = `$${data.totalAnnualSavings}`;
+            document.getElementById('ai-summary').innerText = data.aiSummary;
+
+            resultsDiv.classList.remove('hidden');
+            btn.innerText = "Re-Analyze Spend";
+            btn.disabled = false;
+        } catch (error) {
+            alert("Audit Failed. Check if your Java Backend is running!");
+            btn.innerText = "Analyze My Spend";
+            btn.disabled = false;
+        }
+    }
+</script>
+</body>
+</html>
